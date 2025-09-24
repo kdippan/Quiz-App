@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quiz App</title>
+    <meta name="description" content="Create and take interactive quizzes with AI-generated content">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <img src="assets/logo.svg" alt="Quiz App Logo" class="logo-img">
+                    <h1 class="logo-text">Quiz App</h1>
+                </div>
+                <nav class="nav" role="navigation" aria-label="Main navigation">
+                    <button class="nav-btn" id="homeBtn" aria-current="page">Home</button>
+                    <button class="nav-btn" id="myQuizzesBtn">My Quizzes</button>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main" id="mainContent">
+        <!-- Home View -->
+        <section class="home-view view active" id="homeView">
+            <div class="container">
+                <div class="hero">
+                    <h2 class="hero-title">Welcome to Interactive Quiz App</h2>
+                    <p class="hero-subtitle">Create custom quizzes or generate AI-powered quizzes on any topic</p>
+                </div>
+
+                <div class="actions-grid">
+                    <!-- Generate Quiz Card -->
+                    <div class="action-card">
+                        <h3 class="card-title">Generate AI Quiz</h3>
+                        <p class="card-description">Create a quiz on any topic using AI</p>
+                        <form class="generate-form" id="generateForm">
+                            <div class="form-group">
+                                <label for="topicInput" class="form-label">Topic</label>
+                                <input 
+                                    type="text" 
+                                    id="topicInput" 
+                                    class="form-input" 
+                                    placeholder="e.g., Solar System, History, Science"
+                                    required
+                                    aria-describedby="topicHelp"
+                                >
+                                <small id="topicHelp" class="form-help">Enter any topic you'd like to be quizzed on</small>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="questionsCount" class="form-label">Questions</label>
+                                    <select id="questionsCount" class="form-select">
+                                        <option value="5">5 Questions</option>
+                                        <option value="10">10 Questions</option>
+                                        <option value="15">15 Questions</option>
+                                        <option value="20">20 Questions</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="difficulty" class="form-label">Difficulty</label>
+                                    <select id="difficulty" class="form-select">
+                                        <option value="easy">Easy</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="hard">Hard</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary" id="generateBtn">
+                                <span class="btn-text">Generate Quiz</span>
+                                <span class="btn-loading hidden">Generating...</span>
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Create Custom Quiz Card -->
+                    <div class="action-card">
+                        <h3 class="card-title">Create Custom Quiz</h3>
+                        <p class="card-description">Build your own quiz with custom questions</p>
+                        <button class="btn btn-secondary" id="createCustomBtn">Create Quiz</button>
+                    </div>
+
+                    <!-- Take Saved Quiz Card -->
+                    <div class="action-card">
+                        <h3 class="card-title">Take Saved Quiz</h3>
+                        <p class="card-description">Choose from your saved quizzes</p>
+                        <div class="saved-quizzes-list" id="savedQuizzesList">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz View -->
+        <section class="quiz-view view" id="quizView">
+            <div class="container">
+                <div class="quiz-header">
+                    <div class="quiz-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <span class="progress-text" id="progressText">Question 1 of 5</span>
+                    </div>
+                    <button class="btn btn-text" id="quitQuizBtn">Quit Quiz</button>
+                </div>
+
+                <div class="quiz-content">
+                    <div class="question-card" id="questionCard">
+                        <h3 class="question-text" id="questionText"></h3>
+                        <div class="options-list" id="optionsList" role="radiogroup" aria-labelledby="questionText">
+                            <!-- Options populated by JavaScript -->
+                        </div>
+                        <div class="question-actions">
+                            <button class="btn btn-secondary" id="prevBtn" disabled>Previous</button>
+                            <button class="btn btn-primary" id="nextBtn" disabled>Next</button>
+                        </div>
+                        <div class="feedback" id="feedback" role="alert" aria-live="polite">
+                            <!-- Feedback populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Results View -->
+        <section class="results-view view" id="resultsView">
+            <div class="container">
+                <div class="results-content">
+                    <div class="score-summary">
+                        <h2 class="results-title">Quiz Complete!</h2>
+                        <div class="score-display">
+                            <div class="score-circle">
+                                <span class="score-percentage" id="scorePercentage">0%</span>
+                            </div>
+                            <div class="score-details">
+                                <p class="score-text" id="scoreText">You scored 0 out of 0</p>
+                                <p class="score-grade" id="scoreGrade">Grade: F</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="review-section">
+                        <h3 class="review-title">Question Review</h3>
+                        <div class="review-list" id="reviewList">
+                            <!-- Review items populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="results-actions">
+                        <button class="btn btn-primary" id="retakeBtn">Retake Quiz</button>
+                        <button class="btn btn-secondary" id="saveQuizBtn">Save Quiz</button>
+                        <button class="btn btn-text" id="homeFromResultsBtn">Back to Home</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quiz Creator View -->
+        <section class="creator-view view" id="creatorView">
+            <div class="container">
+                <div class="creator-header">
+                    <h2 class="creator-title">Create Custom Quiz</h2>
+                    <button class="btn btn-text" id="cancelCreateBtn">Cancel</button>
+                </div>
+
+                <form class="creator-form" id="creatorForm">
+                    <div class="form-group">
+                        <label for="quizTitle" class="form-label">Quiz Title</label>
+                        <input 
+                            type="text" 
+                            id="quizTitle" 
+                            class="form-input" 
+                            placeholder="Enter quiz title"
+                            required
+                        >
+                    </div>
+
+                    <div class="questions-section">
+                        <div class="section-header">
+                            <h3 class="section-title">Questions</h3>
+                            <button type="button" class="btn btn-secondary" id="addQuestionBtn">Add Question</button>
+                        </div>
+                        <div class="questions-list" id="questionsList">
+                            <!-- Questions populated by JavaScript -->
+                        </div>
+                    </div>
+
+                    <div class="creator-actions">
+                        <button type="submit" class="btn btn-primary">Save Quiz</button>
+                        <button type="button" class="btn btn-text" id="cancelCreateBtn2">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- My Quizzes View -->
+        <section class="my-quizzes-view view" id="myQuizzesView">
+            <div class="container">
+                <h2 class="page-title">My Quizzes</h2>
+                <div class="my-quizzes-grid" id="myQuizzesGrid">
+                    <!-- Quiz cards populated by JavaScript -->
+                </div>
+                <div class="empty-state hidden" id="emptyQuizzesState">
+                    <p class="empty-text">No saved quizzes yet. Create your first quiz!</p>
+                    <button class="btn btn-primary" id="createFirstQuizBtn">Create Quiz</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p class="loading-text">Generating your quiz...</p>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer">
+        <!-- Toasts populated by JavaScript -->
+    </div>
+
+    <!-- Scripts -->
+    <script src="utils/scoring.js"></script>
+    <script src="components/localStorageManager.js"></script>
+    <script src="components/quizRenderer.js"></script>
+    <script src="components/quizCreator.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
