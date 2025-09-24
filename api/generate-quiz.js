@@ -19,7 +19,7 @@ async function callOpenRouter(prompt) {
         'X-Title': 'Interactive Quiz App'
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'x-ai/grok-4-fast:free',
         messages: [{ 
           role: 'user', 
           content: prompt 
