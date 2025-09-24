@@ -15,11 +15,11 @@ async function callOpenRouter(prompt) {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${OPENROUTER_KEY}`,
-        'HTTP-Referer': 'https://quiz-app.netlify.app',
+        'HTTP-Referer': 'https://testquizappk.netlify.app/',
         'X-Title': 'Interactive Quiz App'
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
+        model: 'x-ai/grok-4-fast:free',
         messages: [{ 
           role: 'user', 
           content: prompt 
