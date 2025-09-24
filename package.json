@@ -1,0 +1,42 @@
+{
+  "name": "interactive-quiz-app",
+  "version": "1.0.0",
+  "description": "A modern, responsive Interactive Quiz App with OpenRouter integration",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "concurrently \"npm run server:dev\" \"npm run client:dev\"",
+    "server:dev": "nodemon server/index.js",
+    "client:dev": "serve client -l 3000",
+    "test": "jest",
+    "build": "echo 'Build completed - static files ready for deployment'",
+    "deploy:netlify": "netlify deploy --prod",
+    "deploy:vercel": "vercel --prod"
+  },
+  "keywords": [
+    "quiz",
+    "interactive",
+    "openrouter",
+    "javascript",
+    "html",
+    "css",
+    "responsive"
+  ],
+  "author": "Quiz App Developer",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^2.7.0",
+    "dotenv": "^16.3.1",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "concurrently": "^8.2.2",
+    "serve": "^14.2.1",
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}

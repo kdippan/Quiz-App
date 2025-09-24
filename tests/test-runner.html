@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz App Tests</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-pass {
+            color: green;
+        }
+        .test-fail {
+            color: red;
+        }
+        .test-results {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Quiz App - Manual Tests</h1>
+    
+    <div class="test-section">
+        <h2>Scoring Utils Tests</h2>
+        <div id="scoring-tests"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Local Storage Manager Tests</h2>
+        <div id="storage-tests"></div>
+    </div>
+    
+    <div class="test-results" id="test-results">
+        <strong>Test Results:</strong>
+        <div id="results-summary"></div>
+    </div>
+
+    <!-- Load the utility scripts -->
+    <script src="../client/utils/scoring.js"></script>
+    <script src="../client/components/localStorageManager.js"></script>
+    
+    <script>
+        // Simple test framework
+        class SimpleTest {
+            constructor() {
+                this.tests = [];
+                this.passed = 0;
+                this.failed = 0;
+            }
+            
+            test(name, testFn) {
+                try {
+                    testFn();
+                    this.passed++;
+                    this.log(name, true);
+                } catch (error) {
+                    this.failed++;
+                    this.log(name, false, error.message);
+                }
+            }
+            
+            expect(value) {
+                return {
+                    toBe: (expected) => {
+                        if (value !== expected) {
+                            throw new Error(`Expected ${value} to be ${expected}`);
+                        }
+                    },
+                    toEqual: (expected) => {
+                        if (JSON.stringify(value) !== JSON.stringify(expected)) {
+                            throw new Error(`Expected ${JSON.stringify(value)} to equal ${JSON.stringify(expected)}`);
+                        }
+                    },
+                    toThrow: (expectedMessage) => {
+                        let threw = false;
+                        try {
+                            if (typeof value === 'function') {
+                                value();
+                            }
+                        } catch (error) {
+                            threw = true;
+                            if (expectedMessage && !error.message.includes(expectedMessage)) {
+                                throw new Error(`Expected error message to contain "${expectedMessage}", got "${error.message}"`);
+                            }
+                        }
+                        if (!threw) {
+                            throw new Error('Expected function to throw an error');
+                        }
+                    }
+                };
+            }
+            
+            log(testName, passed, error) {
+                const container = document.getElementById('scoring-tests');
+                const div = document.createElement('div');
+                div.className = passed ? 'test-pass' : 'test-fail';
+                div.innerHTML = `${passed ? '✓' : '✗'} ${testName}${error ? ': ' + error : ''}`;
+                container.appendChild(div);
+            }
+            
+            summary() {
+                const total = this.passed + this.failed;
+                const percentage = total > 0 ? Math.round((this.passed / total) * 100) : 0;
+                document.getElementById('results-summary').innerHTML = `
+                    <div>Total Tests: ${total}</div>
+                    <div class="test-pass">Passed: ${this.passed}</div>
+                    <div class="test-fail">Failed: ${this.failed}</div>
+                    <div>Success Rate: ${percentage}%</div>
+                `;
+            }
+        }
+        
+        // Run tests
+        const test = new SimpleTest();
+        
+        // Test scoring utilities
+        test.test('calculateScore - perfect score', () => {
+            const result = window.ScoringUtils.calculateScore([1, 2, 0], [1, 2, 0]);
+            test.expect(result.percentage).toBe(100);
+            test.expect(result.grade).toBe('A');
+            test.expect(result.passed).toBe(true);
+        });
+        
+        test.test('calculateScore - partial score', () => {
+            const result = window.ScoringUtils.calculateScore([1, 2, 1], [1, 2, 0]);
+            test.expect(result.percentage).toBe(67);
+            test.expect(result.correct).toBe(2);
+            test.expect(result.total).toBe(3);
+        });
+        
+        test.test('calculateScore - failing score', () => {
+            const result = window.ScoringUtils.calculateScore([0, 0], [1, 1]);
+            test.expect(result.percentage).toBe(0);
+            test.expect(result.grade).toBe('F');
+            test.expect(result.passed).toBe(false);
+        });
+        
+        test.test('calculateScore - error on mismatched arrays', () => {
+            test.expect(() => window.ScoringUtils.calculateScore([1, 2], [1])).toThrow('same length');
+        });
+        
+        test.test('getGrade - various percentages', () => {
+            test.expect(window.ScoringUtils.getGrade(95)).toBe('A');
+            test.expect(window.ScoringUtils.getGrade(85)).toBe('B');
+            test.expect(window.ScoringUtils.getGrade(75)).toBe('C');
+            test.expect(window.ScoringUtils.getGrade(65)).toBe('D');
+            test.expect(window.ScoringUtils.getGrade(55)).toBe('F');
+        });
+        
+        test.test('formatTime', () => {
+            test.expect(window.ScoringUtils.formatTime(0)).toBe('00:00');
+            test.expect(window.ScoringUtils.formatTime(90)).toBe('01:30');
+            test.expect(window.ScoringUtils.formatTime(3661)).toBe('61:01');
+        });
+        
+        // Test localStorage manager
+        const storage = new window.LocalStorageManager();
+        
+        test.test('LocalStorageManager - isAvailable', () => {
+            test.expect(typeof storage.isAvailable()).toBe('boolean');
+        });
+        
+        test.test('LocalStorageManager - generateId', () => {
+            const id1 = storage.generateId();
+            const id2 = storage.generateId();
+            test.expect(typeof id1).toBe('string');
+            test.expect(id1 !== id2).toBe(true);
+        });
+        
+        // Clean up any test data
+        if (storage.isAvailable()) {
+            test.test('LocalStorageManager - save and get quiz', () => {
+                const testQuiz = {
+                    quizTitle: 'Test Quiz',
+                    questions: [
+                        {
+                            id: 'q1',
+                            questionText: 'Test question?',
+                            options: ['A', 'B', 'C', 'D'],
+                            correctIndex: 1
+                        }
+                    ]
+                };
+                
+                const quizId = storage.saveQuiz(testQuiz);
+                test.expect(typeof quizId).toBe('string');
+                
+                const retrievedQuiz = storage.getQuiz(quizId);
+                test.expect(retrievedQuiz.quizTitle).toBe('Test Quiz');
+                test.expect(retrievedQuiz.questions.length).toBe(1);
+                
+                // Clean up
+                storage.deleteQuiz(quizId);
+            });
+        }
+        
+        // Display results
+        test.summary();
+        
+        console.log('Manual tests completed. Check the page for results.');
+    </script>
+</body>
+</html>
